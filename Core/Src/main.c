@@ -28,22 +28,22 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-// 定义LED状态
-// 修改LED状态结构体，添加一个表示LED引脚的枚举成员
+// 定义LED状�??
+// 修改LED状�?�结构体，添加一个表示LED引脚的枚举成�?
 typedef enum {
     LED_PIN_0 = GPIO_PIN_0,
     LED_PIN_1 = GPIO_PIN_1,
-    LED_PIN_3 = GPIO_PIN_3,
-    LED_PIN_4 = GPIO_PIN_4,
-    LED_PIN_5 = GPIO_PIN_5,
-    LED_PIN_6 = GPIO_PIN_6,
+    LED_PIN_3 = GPIO_PIN_5,
+    LED_PIN_4 = GPIO_PIN_6,
+    LED_PIN_5 = GPIO_PIN_12,
+    LED_PIN_6 = GPIO_PIN_13,
 } LED_Pin;
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// LED状态结构体
+// LED状�?�结构体
 typedef struct {
     bool should_flash;
     bool should_glow;
@@ -59,8 +59,8 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-// 初始化LED状态
-// 在初始化LED状态时，给每个LED分配正确的引脚
+// 初始化LED状�??
+// 在初始化LED状�?�时，给每个LED分配正确的引�?
 LEDStatus led_status[6] = {
     {false, false, LED_PIN_0},
     {false, false, LED_PIN_1},
@@ -76,7 +76,7 @@ LEDStatus led_status[6] = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
-// 设置LED状态
+// 设置LED状�??
 void SetLEDStatusBasedOnNumbers(int numbers[6]) {
     for (int i = 0; i < 6; ++i) {
         switch(numbers[i]) {
@@ -95,7 +95,7 @@ void SetLEDStatusBasedOnNumbers(int numbers[6]) {
                 break;
             default:
                 led_status[i].should_glow = false;
-                led_status[i].should_flash = false; // 默认情况下不亮也不闪烁
+                led_status[i].should_flash = false; // 默认情况下不亮也不闪�?
                 break;
         }
     }
@@ -134,7 +134,7 @@ void ControlLEDs(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  int numbers[6] = {9, 7, 8, 6, 7, 9}; // 示例数字数组，根据实际情况更改
+int numbers[6] = {9, 9, 9, 9, 9, 9};
     SetLEDStatusBasedOnNumbers(numbers);
 
   /* USER CODE END 1 */
@@ -158,7 +158,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -166,9 +166,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-        ControlLEDs();
-        HAL_Delay(100); // 闪烁间隔，可以根据需要调整
+
     /* USER CODE BEGIN 3 */
+	  ControlLEDs();
+	  HAL_Delay(1000); // 闪烁间隔，可以根据需要调�?
   }
   /* USER CODE END 3 */
 }
@@ -224,13 +225,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_4
-                          |GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_12|GPIO_PIN_13
+                          |GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PB0 PB1 PB3 PB4
-                           PB5 PB6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_3|GPIO_PIN_4
-                          |GPIO_PIN_5|GPIO_PIN_6;
+  /*Configure GPIO pins : PB0 PB1 PB12 PB13
+                           PB3 PB4 PB5 PB6 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_12|GPIO_PIN_13
+                          |GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
