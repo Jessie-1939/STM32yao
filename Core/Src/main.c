@@ -100,24 +100,24 @@ void SetLEDStatusBasedOnNumbers(int numbers[6]) {
         }
     }
 }
-// 然后在ControlLEDs函数中，使用这个新的LED_pin成员
+// 更改ControlLEDs()函数，使用一个独立的定时器变量
 void ControlLEDs(void) {
-    for (int i = 0; i < 6; ++i) {
-        if (led_status[i].should_glow) {
-            if (led_status[i].should_flash) {
-                static int blink_count = 0;
-                if (blink_count % 2 == 0) {
-                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
+    static uint32_t timer = 0;
+    if (timer++ % 2 == 0) { // 每隔100毫秒切换一次
+        for (int i = 0; i < 6; ++i) {
+            if (led_status[i].should_glow) {
+                if (led_status[i].should_flash) {
+                    HAL_GPIO_TogglePin(GPIOB, led_status[i].pin);
                 } else {
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
                 }
-                blink_count++;
             } else {
-                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
             }
-        } else {
-            HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
         }
+    }
+    if (timer >= 200) { // 每200毫秒重置一次
+        timer = 0;
     }
 }
 /* USER CODE END PFP */
@@ -134,7 +134,7 @@ void ControlLEDs(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-int numbers[6] = {9, 9, 9, 9, 9, 9};
+	int numbers[6] = {7, 7, 7, 7, 7, 7};
     SetLEDStatusBasedOnNumbers(numbers);
 
   /* USER CODE END 1 */
@@ -168,8 +168,12 @@ int numbers[6] = {9, 9, 9, 9, 9, 9};
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  ControlLEDs();
+	 // ControlLEDs();
 	  HAL_Delay(1000); // 闪烁间隔，可以根据需要调�?
+		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+		  HAL_Delay(1000); // 闪烁间隔，可以根据需要调�?
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+
   }
   /* USER CODE END 3 */
 }
