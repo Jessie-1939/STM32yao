@@ -29,9 +29,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
  12 .comment      00000043  00000000  00000000  00020065  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0000299d  00000000  00000000  000200a8  2**0
+ 13 .debug_info   0000299f  00000000  00000000  000200a8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00000e2e  00000000  00000000  00022a45  2**0
+ 14 .debug_abbrev 00000e2d  00000000  00000000  00022a47  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_aranges 000003e0  00000000  00000000  00023878  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -177,18 +177,19 @@ void ControlLEDs(void) {
  80001da:	f000 f9e7 	bl	80005ac <HAL_GetTick>
  80001de:	6038      	str	r0, [r7, #0]
     
-    for (int i = 0; i < 6; i++) {
+    //0和3都是闪烁，1是常亮，2是不亮，但是0亮的时间比不亮的多，3亮的时间比不亮的少
+     for (int i = 0; i < 6; i++) {
  80001e0:	2300      	movs	r3, #0
  80001e2:	607b      	str	r3, [r7, #4]
- 80001e4:	e06f      	b.n	80002c6 <ControlLEDs+0xf2>
+ 80001e4:	e071      	b.n	80002ca <ControlLEDs+0xf6>
         switch (led_status[i].status) {
- 80001e6:	4a3c      	ldr	r2, [pc, #240]	; (80002d8 <ControlLEDs+0x104>)
+ 80001e6:	4a3d      	ldr	r2, [pc, #244]	; (80002dc <ControlLEDs+0x108>)
  80001e8:	687b      	ldr	r3, [r7, #4]
  80001ea:	00db      	lsls	r3, r3, #3
  80001ec:	4413      	add	r3, r2
  80001ee:	685b      	ldr	r3, [r3, #4]
  80001f0:	2b03      	cmp	r3, #3
- 80001f2:	d865      	bhi.n	80002c0 <ControlLEDs+0xec>
+ 80001f2:	d867      	bhi.n	80002c4 <ControlLEDs+0xf0>
  80001f4:	a201      	add	r2, pc, #4	; (adr r2, 80001fc <ControlLEDs+0x28>)
  80001f6:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
  80001fa:	bf00      	nop
@@ -197,122 +198,121 @@ void ControlLEDs(void) {
  8000204:	08000269 	.word	0x08000269
  8000208:	0800027d 	.word	0x0800027d
             case 0:
-                if ((current_time - last_time) % 2000 < 1000) {
- 800020c:	4b33      	ldr	r3, [pc, #204]	; (80002dc <ControlLEDs+0x108>)
+                if ((current_time - last_time) % 6000 < 4000) { // 0号LED 亮2秒，暗1秒
+ 800020c:	4b34      	ldr	r3, [pc, #208]	; (80002e0 <ControlLEDs+0x10c>)
  800020e:	681b      	ldr	r3, [r3, #0]
  8000210:	683a      	ldr	r2, [r7, #0]
  8000212:	1ad2      	subs	r2, r2, r3
- 8000214:	4b32      	ldr	r3, [pc, #200]	; (80002e0 <ControlLEDs+0x10c>)
+ 8000214:	4b33      	ldr	r3, [pc, #204]	; (80002e4 <ControlLEDs+0x110>)
  8000216:	fba3 1302 	umull	r1, r3, r3, r2
  800021a:	09db      	lsrs	r3, r3, #7
- 800021c:	f44f 61fa 	mov.w	r1, #2000	; 0x7d0
+ 800021c:	f241 7170 	movw	r1, #6000	; 0x1770
  8000220:	fb01 f303 	mul.w	r3, r1, r3
  8000224:	1ad3      	subs	r3, r2, r3
- 8000226:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
+ 8000226:	f5b3 6f7a 	cmp.w	r3, #4000	; 0xfa0
  800022a:	d209      	bcs.n	8000240 <ControlLEDs+0x6c>
-                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
- 800022c:	4a2a      	ldr	r2, [pc, #168]	; (80002d8 <ControlLEDs+0x104>)
+                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
+ 800022c:	4a2b      	ldr	r2, [pc, #172]	; (80002dc <ControlLEDs+0x108>)
  800022e:	687b      	ldr	r3, [r7, #4]
  8000230:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
- 8000234:	2200      	movs	r2, #0
+ 8000234:	2201      	movs	r2, #1
  8000236:	4619      	mov	r1, r3
- 8000238:	482a      	ldr	r0, [pc, #168]	; (80002e4 <ControlLEDs+0x110>)
+ 8000238:	482b      	ldr	r0, [pc, #172]	; (80002e8 <ControlLEDs+0x114>)
  800023a:	f000 fc29 	bl	8000a90 <HAL_GPIO_WritePin>
                 } else {
-                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
+                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
                 }
                 break;
- 800023e:	e03f      	b.n	80002c0 <ControlLEDs+0xec>
-                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
- 8000240:	4a25      	ldr	r2, [pc, #148]	; (80002d8 <ControlLEDs+0x104>)
+ 800023e:	e041      	b.n	80002c4 <ControlLEDs+0xf0>
+                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
+ 8000240:	4a26      	ldr	r2, [pc, #152]	; (80002dc <ControlLEDs+0x108>)
  8000242:	687b      	ldr	r3, [r7, #4]
  8000244:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
- 8000248:	2201      	movs	r2, #1
+ 8000248:	2200      	movs	r2, #0
  800024a:	4619      	mov	r1, r3
- 800024c:	4825      	ldr	r0, [pc, #148]	; (80002e4 <ControlLEDs+0x110>)
+ 800024c:	4826      	ldr	r0, [pc, #152]	; (80002e8 <ControlLEDs+0x114>)
  800024e:	f000 fc1f 	bl	8000a90 <HAL_GPIO_WritePin>
                 break;
- 8000252:	e035      	b.n	80002c0 <ControlLEDs+0xec>
+ 8000252:	e037      	b.n	80002c4 <ControlLEDs+0xf0>
             case 1:
-                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
- 8000254:	4a20      	ldr	r2, [pc, #128]	; (80002d8 <ControlLEDs+0x104>)
+                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET); // 1号LED 常亮
+ 8000254:	4a21      	ldr	r2, [pc, #132]	; (80002dc <ControlLEDs+0x108>)
  8000256:	687b      	ldr	r3, [r7, #4]
  8000258:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
  800025c:	2201      	movs	r2, #1
  800025e:	4619      	mov	r1, r3
- 8000260:	4820      	ldr	r0, [pc, #128]	; (80002e4 <ControlLEDs+0x110>)
+ 8000260:	4821      	ldr	r0, [pc, #132]	; (80002e8 <ControlLEDs+0x114>)
  8000262:	f000 fc15 	bl	8000a90 <HAL_GPIO_WritePin>
                 break;
- 8000266:	e02b      	b.n	80002c0 <ControlLEDs+0xec>
+ 8000266:	e02d      	b.n	80002c4 <ControlLEDs+0xf0>
             case 2:
-                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
- 8000268:	4a1b      	ldr	r2, [pc, #108]	; (80002d8 <ControlLEDs+0x104>)
+                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET); // 2号LED 不亮
+ 8000268:	4a1c      	ldr	r2, [pc, #112]	; (80002dc <ControlLEDs+0x108>)
  800026a:	687b      	ldr	r3, [r7, #4]
  800026c:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
  8000270:	2200      	movs	r2, #0
  8000272:	4619      	mov	r1, r3
- 8000274:	481b      	ldr	r0, [pc, #108]	; (80002e4 <ControlLEDs+0x110>)
+ 8000274:	481c      	ldr	r0, [pc, #112]	; (80002e8 <ControlLEDs+0x114>)
  8000276:	f000 fc0b 	bl	8000a90 <HAL_GPIO_WritePin>
                 break;
- 800027a:	e021      	b.n	80002c0 <ControlLEDs+0xec>
+ 800027a:	e023      	b.n	80002c4 <ControlLEDs+0xf0>
             case 3:
-                if ((current_time - last_time) % 200 < 100) {
- 800027c:	4b17      	ldr	r3, [pc, #92]	; (80002dc <ControlLEDs+0x108>)
+                if ((current_time - last_time) % 6000 < 1000) { // 3号LED 亮1秒，暗2秒
+ 800027c:	4b18      	ldr	r3, [pc, #96]	; (80002e0 <ControlLEDs+0x10c>)
  800027e:	681b      	ldr	r3, [r3, #0]
  8000280:	683a      	ldr	r2, [r7, #0]
  8000282:	1ad2      	subs	r2, r2, r3
- 8000284:	4b18      	ldr	r3, [pc, #96]	; (80002e8 <ControlLEDs+0x114>)
+ 8000284:	4b17      	ldr	r3, [pc, #92]	; (80002e4 <ControlLEDs+0x110>)
  8000286:	fba3 1302 	umull	r1, r3, r3, r2
- 800028a:	099b      	lsrs	r3, r3, #6
- 800028c:	21c8      	movs	r1, #200	; 0xc8
- 800028e:	fb01 f303 	mul.w	r3, r1, r3
- 8000292:	1ad3      	subs	r3, r2, r3
- 8000294:	2b63      	cmp	r3, #99	; 0x63
- 8000296:	d809      	bhi.n	80002ac <ControlLEDs+0xd8>
+ 800028a:	09db      	lsrs	r3, r3, #7
+ 800028c:	f241 7170 	movw	r1, #6000	; 0x1770
+ 8000290:	fb01 f303 	mul.w	r3, r1, r3
+ 8000294:	1ad3      	subs	r3, r2, r3
+ 8000296:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
+ 800029a:	d209      	bcs.n	80002b0 <ControlLEDs+0xdc>
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
- 8000298:	4a0f      	ldr	r2, [pc, #60]	; (80002d8 <ControlLEDs+0x104>)
- 800029a:	687b      	ldr	r3, [r7, #4]
- 800029c:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
- 80002a0:	2201      	movs	r2, #1
- 80002a2:	4619      	mov	r1, r3
- 80002a4:	480f      	ldr	r0, [pc, #60]	; (80002e4 <ControlLEDs+0x110>)
- 80002a6:	f000 fbf3 	bl	8000a90 <HAL_GPIO_WritePin>
+ 800029c:	4a0f      	ldr	r2, [pc, #60]	; (80002dc <ControlLEDs+0x108>)
+ 800029e:	687b      	ldr	r3, [r7, #4]
+ 80002a0:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
+ 80002a4:	2201      	movs	r2, #1
+ 80002a6:	4619      	mov	r1, r3
+ 80002a8:	480f      	ldr	r0, [pc, #60]	; (80002e8 <ControlLEDs+0x114>)
+ 80002aa:	f000 fbf1 	bl	8000a90 <HAL_GPIO_WritePin>
                 } else {
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
                 }
                 break;
- 80002aa:	e008      	b.n	80002be <ControlLEDs+0xea>
+ 80002ae:	e008      	b.n	80002c2 <ControlLEDs+0xee>
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
- 80002ac:	4a0a      	ldr	r2, [pc, #40]	; (80002d8 <ControlLEDs+0x104>)
- 80002ae:	687b      	ldr	r3, [r7, #4]
- 80002b0:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
- 80002b4:	2200      	movs	r2, #0
- 80002b6:	4619      	mov	r1, r3
- 80002b8:	480a      	ldr	r0, [pc, #40]	; (80002e4 <ControlLEDs+0x110>)
- 80002ba:	f000 fbe9 	bl	8000a90 <HAL_GPIO_WritePin>
+ 80002b0:	4a0a      	ldr	r2, [pc, #40]	; (80002dc <ControlLEDs+0x108>)
+ 80002b2:	687b      	ldr	r3, [r7, #4]
+ 80002b4:	f832 3033 	ldrh.w	r3, [r2, r3, lsl #3]
+ 80002b8:	2200      	movs	r2, #0
+ 80002ba:	4619      	mov	r1, r3
+ 80002bc:	480a      	ldr	r0, [pc, #40]	; (80002e8 <ControlLEDs+0x114>)
+ 80002be:	f000 fbe7 	bl	8000a90 <HAL_GPIO_WritePin>
                 break;
- 80002be:	bf00      	nop
-    for (int i = 0; i < 6; i++) {
- 80002c0:	687b      	ldr	r3, [r7, #4]
- 80002c2:	3301      	adds	r3, #1
- 80002c4:	607b      	str	r3, [r7, #4]
- 80002c6:	687b      	ldr	r3, [r7, #4]
- 80002c8:	2b05      	cmp	r3, #5
- 80002ca:	dd8c      	ble.n	80001e6 <ControlLEDs+0x12>
+ 80002c2:	bf00      	nop
+     for (int i = 0; i < 6; i++) {
+ 80002c4:	687b      	ldr	r3, [r7, #4]
+ 80002c6:	3301      	adds	r3, #1
+ 80002c8:	607b      	str	r3, [r7, #4]
+ 80002ca:	687b      	ldr	r3, [r7, #4]
+ 80002cc:	2b05      	cmp	r3, #5
+ 80002ce:	dd8a      	ble.n	80001e6 <ControlLEDs+0x12>
         }
     }
 }
- 80002cc:	bf00      	nop
- 80002ce:	bf00      	nop
- 80002d0:	3708      	adds	r7, #8
- 80002d2:	46bd      	mov	sp, r7
- 80002d4:	bd80      	pop	{r7, pc}
- 80002d6:	bf00      	nop
- 80002d8:	20000000 	.word	0x20000000
- 80002dc:	20000058 	.word	0x20000058
- 80002e0:	10624dd3 	.word	0x10624dd3
- 80002e4:	40010c00 	.word	0x40010c00
- 80002e8:	51eb851f 	.word	0x51eb851f
+ 80002d0:	bf00      	nop
+ 80002d2:	bf00      	nop
+ 80002d4:	3708      	adds	r7, #8
+ 80002d6:	46bd      	mov	sp, r7
+ 80002d8:	bd80      	pop	{r7, pc}
+ 80002da:	bf00      	nop
+ 80002dc:	20000000 	.word	0x20000000
+ 80002e0:	20000058 	.word	0x20000058
+ 80002e4:	057619f1 	.word	0x057619f1
+ 80002e8:	40010c00 	.word	0x40010c00
 
 080002ec <main>:
 /**
@@ -325,7 +325,7 @@ int main(void)
  80002ee:	b086      	sub	sp, #24
  80002f0:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN 1 */
-  int numbers[6] = {8, 9, 8, 9, 9, 8};
+  int numbers[6] = {6, 7, 8, 9, 8, 9};
  80002f2:	4b0b      	ldr	r3, [pc, #44]	; (8000320 <main+0x34>)
  80002f4:	463c      	mov	r4, r7
  80002f6:	461d      	mov	r5, r3

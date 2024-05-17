@@ -91,23 +91,24 @@ void ControlLEDs(void) {
     static uint32_t last_time = 0;
     uint32_t current_time = HAL_GetTick();
     
-    for (int i = 0; i < 6; i++) {
+    //0和3都是闪烁，1是常亮，2是不亮，0号LED的闪烁周期为3秒（亮2秒，暗1秒），而3号LED的闪烁周期也是3秒（亮1秒，暗2秒）。
+     for (int i = 0; i < 6; i++) {
         switch (led_status[i].status) {
             case 0:
-                if ((current_time - last_time) % 2000 < 1000) {
-                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
-                } else {
+                if ((current_time - last_time) % 6000 < 4000) { // 0号LED 亮2秒，暗1秒
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
+                } else {
+                    HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
                 }
                 break;
             case 1:
-                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET); // 1号LED 常亮
                 break;
             case 2:
-                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET); // 2号LED 不亮
                 break;
             case 3:
-                if ((current_time - last_time) % 200 < 100) {
+                if ((current_time - last_time) % 6000 < 1000) { // 3号LED 亮1秒，暗2秒
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_SET);
                 } else {
                     HAL_GPIO_WritePin(GPIOB, led_status[i].pin, GPIO_PIN_RESET);
@@ -116,7 +117,6 @@ void ControlLEDs(void) {
         }
     }
 }
-
 /* USER CODE END 0 */
 
 /**
@@ -126,7 +126,7 @@ void ControlLEDs(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  int numbers[6] = {8, 9, 8, 9, 9, 8};
+  int numbers[6] = {6, 7, 8, 9, 8, 9};
   SetLEDStatusBasedOnNumbers(numbers);
   /* USER CODE END 1 */
 
