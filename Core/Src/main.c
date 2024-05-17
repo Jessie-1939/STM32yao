@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "yi.h"
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include <stdbool.h>
@@ -126,8 +127,9 @@ void ControlLEDs(void) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  int numbers[6] = {6, 7, 8, 9, 8, 9};
-  SetLEDStatusBasedOnNumbers(numbers);
+  int numbers[6] ;
+   numbers = generateYaoResults();
+    SetLEDStatusBasedOnNumbers(numbers);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
